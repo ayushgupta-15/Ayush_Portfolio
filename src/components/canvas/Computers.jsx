@@ -1,28 +1,41 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Preload, useGLTF } from "@react-three/drei";
-
 import CanvasLoader from "../Loader";
 
 const Computers = ({ isMobile }) => {
-  const computer = useGLTF("./desktop_pc/scene.gltf");
+  const { scene, materials } = useGLTF("./desktop_pc/scene.gltf");
+
+  // Ensure the materials react well to light
+  useEffect(() => {
+    Object.values(materials).forEach((material) => {
+      material.metalness = 0.5;
+      material.roughness = 0.5;
+    });
+  }, [materials]);
 
   return (
     <mesh>
-      <hemisphereLight intensity={0.15} groundColor='black' />
+      <hemisphereLight intensity={0.35} groundColor="black" />
       <spotLight
         position={[-20, 50, 10]}
-        angle={0.12}
+        angle={0.3}
         penumbra={1}
-        intensity={1}
+        intensity={2}
         castShadow
         shadow-mapSize={1024}
       />
-      <pointLight intensity={1} />
+      <pointLight position={[0, 10, 0]} intensity={3} />
+      <pointLight position={[-10, 10, -10]} intensity={3} />
+      <directionalLight
+        position={[10, 10, 10]}
+        intensity={2}
+        castShadow
+      />
       <primitive
-        object={computer.scene}
+        object={scene}
         scale={isMobile ? 0.7 : 0.75}
-        position={isMobile ? [0, -3, -2.2] : [0, -3.25, -1.5]}
+        position={isMobile ? [0, -3, -2.9] : [0, -4, -1.5]} // Adjusted position
         rotation={[-0.01, -0.2, -0.1]}
       />
     </mesh>
@@ -50,7 +63,7 @@ const ComputersCanvas = () => {
 
   return (
     <Canvas
-      frameloop='demand'
+      frameloop="demand"
       shadows
       dpr={[1, 2]}
       camera={{ position: [20, 3, 5], fov: 25 }}
@@ -71,3 +84,4 @@ const ComputersCanvas = () => {
 };
 
 export default ComputersCanvas;
+
